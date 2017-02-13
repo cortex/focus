@@ -1,8 +1,5 @@
-//const pomodoroLength = 20 * 60 * 1000;
-//const tickInterval = 30 * 1000;
-
-const pomodoroLength = 1 * 60 * 1000;
-const tickInterval = 5 * 1000;
+const pomodoroLength = 20 * 60 * 1000;
+const tickInterval = 30 * 1000;
 
 const modes = {
     RUNNING:"RUNNING",
@@ -55,16 +52,6 @@ function scheduleAt(t){
             var appId = tizen.application.getCurrentApplication().appInfo.id;
             var alarm1 = new tizen.AlarmAbsolute(new Date(t));
             tizen.alarm.add(alarm1, appId);
-        }else{
-            console.log("Scheduling using setTimeout");
-            var td = new Date(t) - new Date();
-            console.log(td);
-            setTimeout(
-                td,
-                function(){
-                    console.log("timeout called");
-                }
-            );
         }
 }
 
@@ -89,10 +76,9 @@ function startPomodoro() {
 
 
     // Create the ticks
-    for (var i = now + tickInterval; i <= state.endTime; i += tickInterval) {
+    for (var i = now + tickInterval; i <= (state.endTime - tickInterval); i += tickInterval) {
         state.ticks.push(i);
     }
-    
     scheduleNextTick(state);
     scheduleAt(state.endTime);
     
@@ -102,6 +88,9 @@ function startPomodoro() {
 
 // Schedule exactly one next tick, skip any ones we might have missed
 function scheduleNextTick(state){
+	if (!state.nextTick){
+		state.nextTick = state.ticks.shift();
+	} 
 	while (state.currentTime > state.nextTick) {
 		state.nextTick = state.ticks.shift();
 	}
